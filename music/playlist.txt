@@ -1,0 +1,5 @@
+comet
+天球、彗星は夜を跨いで
+NEXT_COLOR_PLANET
+NOW_ON_SPACE
+Pieces
