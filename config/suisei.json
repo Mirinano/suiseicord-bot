@@ -31,11 +31,14 @@
     "send_voice_log_ch" : 0,
     "AFK_channel" : 0,
 
-    "voice_notice" : {
-        "0": 0,
-        "0": 0,
-        "0": 0
+    "voice_notice_join" : {
+        
     },
+    "voice_notice_left" :{
+
+    },
+    "voice_notic_admin" : 0,
+    "voice_notice" : {
 
     "//5" : "send_welcome_msg?",
     "welcome_msg_ch" : false,
