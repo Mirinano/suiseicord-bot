@@ -1,0 +1,113 @@
+{
+    "//1" : "BOT info",
+    "BotName" : "ロボ街",
+    "NAME" : "suisei",
+    "TOKEN" : "",
+    "color" : [
+        0,
+        189,
+        241
+    ],
+    "action_server_id" : 0,
+    "admin_action_ch_id" : 0,
+
+    "anti_spam": true,
+    
+    "//2" : "op level role name",
+    "op" : {
+        "op1" : "@everyone",
+        "op2" : "",
+        "op3" : "",
+        "op4" : ""
+    },
+
+    "//3" : "save message_log?",
+    "save_message_log" : true,
+    "send_logzipfile": true,
+    "send_logzipfile_channel": 0,
+
+    "//4" : "save voice log?",
+    "save_voice_log" : true,
+    "send_voice_log_ch" : 0,
+    "AFK_channel" : 0,
+
+    "voice_notice" : {
+        "0": 0,
+        "0": 0,
+        "0": 0
+    },
+
+    "//5" : "send_welcome_msg?",
+    "welcome_msg_ch" : false,
+    "welcome_msg_ch_id" : 0,
+    "welcome_msg_ch_random" : false,
+    "welcome_msg_image": true,
+
+    "welcome_msg_ch_auth" : true,
+    "welcome_msg_ch_id_auth" : 0,
+    "welcome_msg_ch_random_auth" : false,
+    "welcome_msg_image_auth": true,
+
+    "welcome_msg_ch_icebreak" : false,
+    "welcome_msg_ch_id_icebreak" : 0,
+    "welcome_msg_ch_random_icebreak" : false,
+    "welcome_msg_image_icebreak": false,
+
+    "welcome_msg_dm" : true,
+    "welcome_msg_dm_random" : false,
+
+    "welcome_msg_dm_auth" : false,
+    "welcome_msg_dm_random_auth" : false,
+
+    "send_member_join/remove_log" : true,
+    "member_join/remove_log_ch" : 0,
+
+    "member_count" : true,
+    "member_count_ch" : 0,
+
+    "//6" : "admin action setting",
+    "ban_del_msg" : 1,
+    "ban_dm" : true,
+    
+    "kick_dm" : true,
+
+    "stop" : 0,
+
+    "receive_dm" : true,
+    "receive_dm_ch" : 0,
+
+    "//7" : "use translation?",
+    "translation" : true,
+
+    "auto_translation" : true,
+    "auto_translation_ch" : 0,
+    "auto_translation_mainlang" : "ja",
+    "auto_translation_targetlang" : "en",
+
+    "//8" : "use auto role system?",
+    "auto_role" : true,
+    "auto_role_ch" : 0,
+
+    "auto_role_emoji" : true,
+    "auto_role_emoji_msg" : [
+        "https://discordapp.com/channels/0/0/0",
+        "https://discordapp.com/channels/0/0/0",
+        "https://discordapp.com/channels/0/0/0",
+        "https://discordapp.com/channels/0/0/0",
+        "https://discordapp.com/channels/0/0/0"
+    ],
+
+    "//9" : "use reaction authentication system?",
+    "reaction_authentication" : true,
+    "reaction_authentication_role" : 0,
+    "reaction_authentication_msg" : "https://discordapp.com/channels/0/0/0",
+
+    "//10" : "use count role system?",
+    "count_role" : true,
+    "count_role_msg" : "https://discordapp.com/channels/0/0/0",
+
+    "//99" : "debug channels",
+    "launch_report" : 0,
+    "test_ch" : 0,
+    "log_request_ch" : 0,
+    "log_request_msg": "$$$$send-msg-log$$$$"
