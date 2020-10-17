@@ -37,8 +37,7 @@
     "voice_notice_left" :{
 
     },
-    "voice_notic_admin" : 0,
-    "voice_notice" : {
+    "voice_notice_admin" : 0,
 
     "//5" : "send_welcome_msg?",
     "welcome_msg_ch" : false,
