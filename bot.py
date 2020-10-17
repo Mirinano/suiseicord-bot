@@ -1328,9 +1328,9 @@ class Bot(Translation, Minesweeper):
         )
     
     async def voice_join_notice_admin(self, vs:discord.VoiceState, member:discord.Member):
-        if self.voice_join_notice_admin is None:
+        if self.voice_notice_admin is None:
             return
-        await self.voice_join_notice_admin.send(
+        await self.voice_notice_admin.send(
             log_format.voice_join_notice.format(
                 user = self.user_name(member),
                 ch   = vs.channel.name,
@@ -1338,9 +1338,9 @@ class Bot(Translation, Minesweeper):
         )
 
     async def voice_left_notice_admin(self, vs:discord.VoiceState, member:discord.Member):
-        if self.voice_join_notice_admin is None:
+        if self.voice_notice_admin is None:
             return
-        await self.voice_join_notice_admin.send(
+        await self.voice_notice_admin.send(
             log_format.voice_left_notice.format(
                 user = self.user_name(member),
                 ch   = vs.channel.name,
