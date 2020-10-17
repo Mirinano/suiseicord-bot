@@ -187,7 +187,7 @@ class Bot(Translation, Minesweeper):
         self.create_op_role_mention()
         await self.set_frequent_data()
         await self.load_capture_message()
-        self.voice_notice = self.load_voice_notice()
+        self.load_voice_notice()
         await self.client.request_offline_members(self.action_server)
 
     #test method
@@ -239,9 +239,14 @@ class Bot(Translation, Minesweeper):
         return self.client._connection.create_message(channel=channel, data=data)
 
     def load_voice_notice(self):
-        if self.config.get("voice_notice") is None:
+        self.voice_notice_join  = self.load_voice_notice2("voice_notice_join")
+        self.voice_notice_left  = self.load_voice_notice2("voice_notice_left")
+        self.voice_notice_admin = self.client.get_channel(self.config.get("voice_notice_admin")) if self.config.get("voice_notice_admin") is not None else None
+
+    def load_voice_notice2(self, k: str):
+        if self.config.get(k) is None:
             return dict()
-        data = self.config.get("voice_notice")
+        data = self.config.get(k)
         for key in data:
             data[key] = self.client.get_channel(data[key])
         return data
@@ -1086,9 +1091,11 @@ class Bot(Translation, Minesweeper):
                 await self.voice_start_action(after, member)
             self.voice_join_action(after, member)
             await self.voice_join_notice(after, member)
+            await self.voice_join_notice_admin(after, member)
         elif action == "remove":
             self.voice_remove_action(before, member)
             await self.voice_left_notice(before, member)
+            await self.voice_left_notice_admin(before, member)
             if self.voice_finish_check(before):
                 await self.voice_finish_action(before)
         elif action == "move":
@@ -1264,6 +1271,7 @@ class Bot(Translation, Minesweeper):
         )
         self.write_file(fp, content)
         await self.voice_left_notice(before, member)
+        await self.voice_left_notice_admin(before, member)
         if self.voice_finish_check(before):
             await self.voice_finish_action(before)
         if self.voice_start_check(after):
@@ -1287,6 +1295,7 @@ class Bot(Translation, Minesweeper):
         )
         self.write_file(fp, content)
         await self.voice_join_notice(after, member)
+        await self.voice_join_notice_admin(after, member)
 
     def voice_afk_log(self):
         fp = self.voice_log.format(self.config["AFK_channel"])
@@ -1297,7 +1306,7 @@ class Bot(Translation, Minesweeper):
             return None
 
     async def voice_join_notice(self, vs:discord.VoiceState, member:discord.Member):
-        ch = self.voice_notice.get(str(vs.channel.id))
+        ch = self.voice_notice_join.get(str(vs.channel.id))
         if ch is None:
             return
         await ch.send(
@@ -1308,10 +1317,30 @@ class Bot(Translation, Minesweeper):
         )
 
     async def voice_left_notice(self, vs:discord.VoiceState, member:discord.Member):
-        ch = self.voice_notice.get(str(vs.channel.id))
+        ch = self.voice_notice_left.get(str(vs.channel.id))
         if ch is None:
             return
         await ch.send(
+            log_format.voice_left_notice.format(
+                user = self.user_name(member),
+                ch   = vs.channel.name,
+            )
+        )
+    
+    async def voice_join_notice_admin(self, vs:discord.VoiceState, member:discord.Member):
+        if self.voice_join_notice_admin is None:
+            return
+        await self.voice_join_notice_admin.send(
+            log_format.voice_join_notice.format(
+                user = self.user_name(member),
+                ch   = vs.channel.name,
+            )
+        )
+
+    async def voice_left_notice_admin(self, vs:discord.VoiceState, member:discord.Member):
+        if self.voice_join_notice_admin is None:
+            return
+        await self.voice_join_notice_admin.send(
             log_format.voice_left_notice.format(
                 user = self.user_name(member),
                 ch   = vs.channel.name,
