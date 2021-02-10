@@ -30,7 +30,8 @@ except:
     print("config file is not found!!!")
     sys.exit(0)
 
-client = discord.Client()
+intents = discord.Intents.all()
+client = discord.Client(intents=intents)
 
 bot = bot.Bot(config, client)
 
