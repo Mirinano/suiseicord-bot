@@ -3,7 +3,7 @@
 suiseicordで動いているBOTのコードです実際に動いているコードと差がある可能性もあります。
 
  python3.8.4
- discord.py 1.4.0
+ discord.py 1.5.1
 
  星街すいせい非公式ファンDiscordサーバー
  すいせいこーど
