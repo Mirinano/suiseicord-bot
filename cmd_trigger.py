@@ -1,4 +1,4 @@
-#!python3.6
+#!python3.8
 cmd_help="/help", "op2" #ok
 #op1
 translation="!t ", "op1" #ok
@@ -7,6 +7,7 @@ add_color="+color", "op1" #ok
 remove_role="-", "op1" #ok
 remove_color="-color", "op1" #ok
 poll="/poll", "op1"
+roulette="/roulette", "op1"
 #op2
 ban="/ban", "op2" #ok
 kick="/kick", "op2" #ok
@@ -27,12 +28,15 @@ get_msg_log="/get-log", "op3" #ok
 ls="/ls", "op3" #ok
 system_message="/system-message", "op3" #ok
 image="/image", "op3"
+block="/block", "op3"
+unblock="/unblock", "op3"
 send_zip="$$send-log$$", "op3" #ok
 send_today_zip="$$send-log-today$$", "op3" #ok
 #op4
 stop_server="$$stop-server$$", "op4"
 restart_server="$$restart-server$$", "op4"
 mass_spam="$$global-spam$$", "op4" #ok
+mass_ban="/mass-ban", "op4" #ok
 
 #memo
 ## receive dm method ok
