@@ -23,6 +23,7 @@ ls = """```
 |  |- welcome-dm-auth.txt
 |  |- welcome-ch-icebreak.txt
 |  |- disagreement_msg.txt
+|  |- donate_guide.txt
 |
 |- roles
    |
