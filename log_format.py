@@ -48,10 +48,10 @@ encoding: {encoding}
 msg_url = "https://discordapp.com/channels/{server}/{ch}/{msg}"
 
 #control role
-role_not_found = "アイドルの名前を間違えていませんか？`+color アイドル名`と記入してください。"
-role_color_changed = "<@{0}>Pさんのお名前を{1}カラーに変更しました！"
-role_color_reset = "<@{0}>Pさんの名前の色をリセットしました！"
-role_changed = "<@{0}>Pさんの役職を変更しました！"
+role_not_found = "アイドルの名前を間違えていませんか？`+color 役職名`と記入してください。"
+role_color_changed = "<@{0}>さんのお名前を{1}カラーに変更しました！"
+role_color_reset = "<@{0}>さんの名前の色をリセットしました！"
+role_changed = "<@{0}>さんの役職を変更しました！"
 role_list = "役職一覧:\n{0}"
 
 #member join/remove
@@ -242,6 +242,28 @@ DM内容: {dm_content}
 実行に必要な承認人数: {accept_count}
 中止に必要な承認人数: {cancel_count}
 """
+mass_ban_check = """【一括BAN実行確認】
+実行者: {cmder}
+対象ID:
+```
+{targets}
+```
+------------------------
+コマンド承認: {op_level}
+実行に必要な承認人数: {accept_count}
+中止に必要な承認人数: {cancel_count}
+"""
+mass_ban_result = """mass BAN log
+命令時間: {start_time}
+完了時間: {end_time}
+成功
+```
+{success}
+```
+失敗
+```
+{fail}
+```"""
 
 #stop
 stop_result = """【発言の禁止処置】
@@ -382,3 +404,40 @@ Role Mentions : {role_mentions}
 
 poll_err_noitem = "選択肢がありません。"
 poll_err_over = "要素数が多すぎます。最大20個まで、推奨は15個までです。"
+
+block_user_check = """【ユーザーブロック実施確認】
+次のユーザーをBOTでブロックします。ブロックしたユーザーにはDMの送受信ができなくなります。
+メンション: {mention}
+```
+Name: {user_name}
+ID  : {user_id}
+```
+------------------------
+コマンド承認: {op_level}
+実行に必要な承認人数: {accept_count}
+中止に必要な承認人数: {cancel_count}"""
+block_user = "ブロックしました。"
+block_user_fail = "ブロックできませんでした。\n詳細: {}"
+block_user_result = """【ユーザーブロック実施結果】
+次のユーザーをブロックしました。
+メンション: {mention}
+```
+Name: {user_name}
+ID  : {user_id}
+```"""
+unblock_user = "ブロックを解除しました。"
+unblock_user_fail = "ブロックを解除できませんでした。"
+unblock_user_result = """【ユーザーブロック解除】
+次のユーザーのブロックを解除しました。
+メンション: {mention}
+```
+Name: {user_name}
+ID  : {user_id}
+```"""
+
+roulette_start_content = "✅を押してルーレットスタート！（選択肢数: {0}, 抽出数: {1}）\n(❌を押すとキャンセルします。)"
+roulette_cancel_content = "キャンセルしました。"
+roulette_result = "結果\n```\n{}\n```"
+
+donate_report_success = "✅寄付案内送信成功: {}"
+donate_report_fail = "❌寄付案内送信失敗: {}"
