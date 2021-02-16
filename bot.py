@@ -5,6 +5,7 @@ import time, datetime
 import json, re, requests
 import urllib.parse
 import urllib.request
+from urllib.parse import urlencode
 import random
 from PIL import Image
 from PIL import ImageDraw
@@ -169,7 +170,7 @@ class Bot(Translation, Minesweeper):
         self.msg_zip_log = self.bot_dir + "zip_log/"
         self.check_path_exits(self.msg_zip_log)
         ##voice log
-        voice_log_dir = self.bot_dir + "/voice_log/"
+        voice_log_dir = self.bot_dir + "voice_log/"
         voice_log_archive_dir = voice_log_dir + "archive/"
         self.voice_log = voice_log_dir + "{}.txt"
         self.voice_log_archive = voice_log_archive_dir + "{}.txt"
@@ -177,6 +178,14 @@ class Bot(Translation, Minesweeper):
         self.voice_afk_log()
         ##image dir
         self.image_dir = self.bot_dir + "images/"
+        ##load donate
+        self.donate_channel = self.config.get("donate_channel")
+        self.donate_word = self.config.get("donate_word")
+        self.donate_emoji = self.config.get("donate_emoji")
+        self.donate_msgs = list()
+        self.donate_formlink = self.config.get("donate_formlink")
+        self.donate_entrys = self.config.get("donate_entrys")
+        self.donate_report_id = self.config.get("donate_report")
 
         #setup
         self.load_spam()
@@ -189,6 +198,8 @@ class Bot(Translation, Minesweeper):
         await self.load_capture_message()
         self.load_voice_notice()
         await self.client.request_offline_members(self.action_server)
+        if self.donate_report_id is not None:
+            self.donate_report = self.client.get_channel(self.donate_report_id)
 
     #test method
     async def launch_report(self):
@@ -418,7 +429,7 @@ class Bot(Translation, Minesweeper):
 
     def create_msg_url(self, msg:discord.Message) -> str:
         return log_format.msg_url.format(
-            server = "@me" if msg.channel.is_private else msg.guild.id,
+            server = "@me" if isinstance(msg.channel, (discord.DMChannel, discord.GroupChannel)) else msg.guild.id,
             ch = msg.channel.id,
             msg = msg.id
         )
@@ -1384,7 +1395,7 @@ class Bot(Translation, Minesweeper):
             accept_count = str(accept_count),
             cancel_count = str(cancel_count)
         )
-        check = await self.check_execute_cmd(msg, accept_count, cancel_count, content=check_content)
+        check = await self.check_execute_cmd(msg, accept_count, cancel_count, content=check_content, role=self.config["op"][op])
         if check:
             # accept
             await msg.channel.send(log_format.cmd_accept)
@@ -1493,7 +1504,7 @@ class Bot(Translation, Minesweeper):
             accept_count = str(accept_count),
             cancel_count = str(cancel_count)
         )
-        check = await self.check_execute_cmd(msg, accept_count, cancel_count, content=check_content)
+        check = await self.check_execute_cmd(msg, accept_count, cancel_count, content=check_content, role=self.config["op"][op])
         if check:
             # accept
             await msg.channel.send(log_format.cmd_accept)
@@ -1585,6 +1596,48 @@ class Bot(Translation, Minesweeper):
 
     def dm_channel(self, user_id:int):
         return self.client._connection._get_private_channel_by_user(user_id)
+
+    async def mass_ban(self, msg:discord.Message, *, op:str="op4"):
+        start_time = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+        users = msg.content.split("\n")[1:]
+        
+        accept_count = cancel_count = 1
+        check_content = log_format.mass_ban_check.format(
+            cmder = self.save_author(msg.author),
+            targets = "\n".join(users),
+            op_level = self.op_role_mention[op],
+            accept_count = str(accept_count),
+            cancel_count = str(cancel_count)
+        )
+        check = await self.check_execute_cmd(msg, accept_count, cancel_count, content=check_content, role=self.config["op"][op])
+        if check:
+            # accept
+            await msg.channel.send(log_format.cmd_accept)
+        else:
+            # cancel
+            await msg.channel.send(log_format.cmd_cancel)
+            return None
+        
+        success = list()
+        fail = list()
+        for user_id in users:
+            try:
+                await self.__ban(user_id)
+                success.append(user_id)
+            except Exception as e:
+                print(e)
+                fail.append(user_id)
+        
+        end_time = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+        content = log_format.mass_ban_result.format(
+            start_time = start_time,
+            end_time = end_time,
+            success = "\n".join(success) if success else "None",
+            fail = "\n".join(fail) if fail else "None"
+        )
+        ch = self.client.get_channel(self.config["admin_action_ch_id"])
+        await msg.channel.send(log_format.ban_result)
+        await ch.send(content)
 
     ## spam/alert
     async def spam_alert(self, msg:discord.Message):
@@ -1735,7 +1788,7 @@ class Bot(Translation, Minesweeper):
             accept_count = str(accept_count),
             cancel_count = str(cancel_count)
         )
-        check = await self.check_execute_cmd(msg, accept_count, cancel_count, content=check_content)
+        check = await self.check_execute_cmd(msg, accept_count, cancel_count, content=check_content, role=self.config["op"][op])
         if check:
             # accept
             await msg.channel.send(log_format.cmd_accept)
@@ -1797,7 +1850,7 @@ class Bot(Translation, Minesweeper):
             accept_count = str(accept_count),
             cancel_count = str(cancel_count)
         )
-        check = await self.check_execute_cmd(msg, accept_count, cancel_count, content=check_content)
+        check = await self.check_execute_cmd(msg, accept_count, cancel_count, content=check_content, role=self.config["op"][op])
         if check:
             # accept
             await msg.channel.send(log_format.cmd_accept)
@@ -1879,7 +1932,7 @@ class Bot(Translation, Minesweeper):
             accept_count = str(accept_count),
             cancel_count = str(cancel_count)
         )
-        check = await self.check_execute_cmd(msg, accept_count, cancel_count, content=check_content)
+        check = await self.check_execute_cmd(msg, accept_count, cancel_count, content=check_content, role=self.config["op"][op])
         if check:
             # accept
             await msg.channel.send(log_format.cmd_accept)
@@ -2248,7 +2301,8 @@ class Bot(Translation, Minesweeper):
             new_roles = member_roles.union(add_roles)
             await self.replace_role(msg.author.id, list(new_roles))
             result = log_format.role_changed.format(msg.author.id)
-            embed = self.report_user_role_embed(msg.author)
+            member = await msg.guild.fetch_member(msg.author.id)
+            embed = self.report_user_role_embed(member)
             await msg.channel.send(result, embed=embed)
         elif msg.content.startswith("-color"):
             member_roles = {r.id for r in msg.author.roles}
@@ -2267,7 +2321,8 @@ class Bot(Translation, Minesweeper):
             new_roles = member_roles - remove_roles
             await self.replace_role(msg.author.id, list(new_roles))
             result = log_format.role_changed.format(msg.author.id)
-            embed = self.report_user_role_embed(msg.author)
+            member = await msg.guild.fetch_member(msg.author.id)
+            embed = self.report_user_role_embed(member)
             await msg.channel.send(result, embed=embed)
         else:
             return None
@@ -2288,11 +2343,78 @@ class Bot(Translation, Minesweeper):
     def raw_add_emoji_role_control(self, payload:discord.RawReactionActionEvent):
         pass
 
+    async def block_cmd(self, msg: discord.Message, *, op: str="op3"):
+        match = re.search(r"\d+", msg.content)
+        if match is None:
+            await msg.channel.send(log_format.user_not_specified)
+            return None
+        try:
+            user = await self.client.fetch_user(int(match.group(0)))
+        except:
+            await msg.channel.send(log_format.user_not_found)
+            return None
+        accept_count = cancel_count = 1
+        check_content = log_format.block_user_check.format(
+            mention = user.mention,
+            user_name = user.name,
+            user_id = str(user.id),
+            op_level = self.op_role_mention[op],
+            accept_count = str(accept_count),
+            cancel_count = str(cancel_count)
+        )
+        check = await self.check_execute_cmd(msg, accept_count, cancel_count, content=check_content, role=self.config["op"][op])
+        if check:
+            # accept
+            await msg.channel.send(log_format.cmd_accept)
+        else:
+            # cancel
+            await msg.channel.send(log_format.cmd_cancel)
+            return None
+        try:
+            await user.block()
+        except Exception as e:
+            #error
+            await msg.channel.send(log_format.block_user_fail.format(str(e)))
+            return
+        await msg.channel.send(log_format.block_user)
+        await self.admin_action_ch.send(
+            log_format.block_user_result.format(
+                mention = user.mention,
+                user_name = user.name,
+                user_id = str(user.id)
+            )
+        )
+    
+    async def unblock_cmd(self, msg: discord.Message, *, op: str="op3"):
+        match = re.search(r"\d+", msg.content)
+        if match is None:
+            await msg.channel.send(log_format.user_not_specified)
+            return None
+        try:
+            user = await self.client.fetch_user(int(match.group(0)))
+        except:
+            await msg.channel.send(log_format.user_not_found)
+            return None
+        try:
+            await user.unblock()
+        except Exception as e:
+            #error
+            await msg.channel.send(log_format.unblock_user_fail.format(str(e)))
+            return
+        await msg.channel.send(log_format.unblock_user)
+        await self.admin_action_ch.send(
+            log_format.unblock_user_result.format(
+                mention = user.mention,
+                user_name = user.name,
+                user_id = str(user.id)
+            )
+        )
+
     ## cmd check
     async def check_execute_cmd(self, msg:discord.Message, done_count:int=1, cancel_count:int=1, **kwargs) -> bool:
         timeout = 300 if kwargs.get("timeout") is None else kwargs["timeout"]
         cmder = msg.author
-        cmd_role = self.config["op"]["op1"] if kwargs.get("role") is None else kwargs["roke"]
+        cmd_role = self.config["op"]["op2"] if kwargs.get("role") is None else kwargs["role"]
         if kwargs.get("content") is not None:
             msg = await msg.channel.send(kwargs["content"])
         await msg.add_reaction("⭕")
@@ -2302,6 +2424,8 @@ class Bot(Translation, Minesweeper):
             if user == self.client.user:
                 return False
             member = reaction.message.guild.get_member(user.id)
+            if member is None:
+                return False
             return cmd_role in {r.name for r in member.roles}
         
         emoji_count = {"done" : 0, "cancel" : 0}
@@ -2423,6 +2547,89 @@ class Bot(Translation, Minesweeper):
         for r in reac:
             await target.add_reaction(r)
 
+    #roulette
+    async def roulette(self, message: discord.Message):
+        #cmd start
+        channel = message.channel
+        lines = message.content.split("\n")
+        line1 = lines.pop(0)
+        items_text = "\n".join(lines)
+        items = items_text.strip().split("\n")
+        items_count = len(items)
+        extract_text = line1.strip(cmd_trigger.roulette[0])
+        try:
+            extract = int(extract_text)
+        except:
+            extract = 1
+        finally:
+            if extract < 1:
+                extract = 1
+            elif extract > items_count:
+                extract = items_count
+            else:
+                pass
+        #send check message
+        msg = await channel.send(log_format.roulette_start_content.format(items_count, extract))
+        await msg.add_reaction("✅")
+        await msg.add_reaction("❌")
+
+        def check(reaction:discord.Reaction, user:discord.User):
+            if user == self.client.user:
+                return False
+            if str(reaction.emoji) in ("✅", "❌"):
+                return True
+            return False
+        
+        rec, user = await self.client.wait_for('reaction_add', timeout=300, check=check)
+        if str(rec.emoji) == "✅":
+            #start
+            pass
+        else:
+            #cancel
+            await channel.send(log_format.roulette_cancel_content)
+            return
+        content = log_format.roulette_result.format("\n".join(random.sample(items, extract)))
+        await channel.send(content)
+
+    #donate system from suiseicord
+    async def donation(self, payload:discord.RawReactionActionEvent):
+        if str(payload.emoji) != self.donate_emoji:
+            return None
+        if payload.channel_id != self.donate_channel:
+            return None
+        if payload.message_id in self.donate_msgs:
+            await self.send_donation(payload.member)
+            return None
+        #get target message
+        ch = self.client.get_channel(payload.channel_id)
+        msg = await ch.fetch_message(payload.message_id)
+        if self.donate_word in msg.content:
+            #add donate message_id list
+            self.donate_msgs.append(payload.message_id)
+            await self.send_donation(payload.member)
+        return None
+    
+    async def send_donation(self, member:discord.Member):
+        url = self.create_donate_formlink(member)
+        fp = self.sys_msg_dir + "donate_guide.txt"
+        with open(fp, "r", encoding="utf-8") as f:
+            content = f.read()
+        content = content.replace("<URL>", url)
+        try:
+            await self.send_dm_message(member.id, content)
+            #report
+            await self.donate_report.send(log_format.donate_report_success.format(self.save_author(member)))
+        except Exception as e:
+            #report fail
+            await self.donate_report.send(log_format.donate_report_fail.format(self.save_author(member)))
+            
+
+    def create_donate_formlink(self, user:discord.User):
+        query = {
+            "entry.{}".format(self.donate_entrys["id"]) : user.id,
+            "entry.{}".format(self.donate_entrys["name"]) : str(user)
+        }
+        return '%s?%s' % (self.donate_formlink, urlencode(query))
 
     #Basic function
     def user_name(self, author):
