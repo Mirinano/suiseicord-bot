@@ -11,6 +11,10 @@ You can use the following command:
 ```"""
 
 help_cmd = {
+    "op1" : [
+        "/poll",
+        "/roulette"
+    ],
     "op2" : [
         "/ban",
         "/kick",
@@ -32,10 +36,13 @@ help_cmd = {
         "/get-dm",
         "/unban",
         "/image",
+        "/block",
+        "/unblock",
         "$$send-log$$",
         "$$send-log-today$$"
     ],
     "op4" : [
+        "/mass-ban",
         "$$stop-server$$ ##undone",
         "$$restart-server$$ ##undon",
         "$$mass-spam$$"
@@ -98,6 +105,17 @@ required:
 <word>
 ```
 Check spam words and add spam words.
+```
+option:
+    action | default: check | <check, add, remove>.
+    word   | default: None  | Add or remove words to auto-ban. Write one word per line.
+```""",
+
+    "alert" : """```
+/alert <action>
+<word>
+```
+Check alert words and add alert words.
 ```
 option:
     action | default: check | <check, add, remove>.
@@ -293,5 +311,67 @@ Create an image of the specified type.
 required:
     type   | default: welcome | <welcome, boost, ...>.
     target | default: author  | userid or mention.
+```""",
+
+    "block" : """```
+/block <user_id>
+```
+Blocks the user.
+```
+required:
+    user | user-mention or user-id. ex: /user @test#111
+```""",
+
+    "unblock" : """```
+/unblock <user_id>
+```
+Unblocks the user.
+```
+required:
+    user | user-mention or user-id. ex: /user @test#111
+```""",
+
+    "poll" : """【アンケート機能】
+全てのチャンネルで全員が使用可能。
+20択までの選択肢に対してリアクションをつけたアンケートを作ります。
+[使い方]
+```
+/poll 質問文 "選択肢A" "選択肢B" "選択肢C" ... "選択肢T"
+```
+```
+/poll Yes/Noの質問文
+```
+""",
+
+    "roulette" : """【ルーレット機能】
+与えられた選択肢からランダムに選びます。
+```
+/roulette
+選択肢A
+選択肢B
+選択肢C
+...
+```
+複数個を選ぶこともできます。
+```
+/roulette 3
+選択肢A
+選択肢B
+選択肢C
+選択肢D
+選択肢E
+...
+```""",
+
+    "mass-ban" : """```
+/mass-ban
+<user-id>
+<user-id>
+...
+```
+BAN the specified users at once.
+```
+required:
+    user | user-mention or user-id. ex: /user @test#111
 ```"""
 }
