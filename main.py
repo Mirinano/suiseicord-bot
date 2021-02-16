@@ -106,6 +106,14 @@ async def on_message(message):
                 await bot.image_cmd(message, op=cmd_trigger.image[1])
             elif bot.check_cmd_start(message, cmd_trigger.poll): #image
                 await bot.poll(message)
+            elif bot.check_cmd_start(message, cmd_trigger.block): #block
+                await bot.block_cmd(message)
+            elif bot.check_cmd_start(message, cmd_trigger.unblock): #unblock
+                await bot.unblock_cmd(message)
+            elif bot.check_cmd_start(message, cmd_trigger.roulette): #roulette
+                await bot.roulette(message)
+            elif bot.check_cmd_start(message, cmd_trigger.mass_ban): #mass ban
+                await bot.mass_ban(message, op=cmd_trigger.mass_ban[1])
             else:
                 pass
         
@@ -199,6 +207,8 @@ async def on_raw_reaction_add(payload):
         await bot.raw_count_role(payload)
     if config.get("auto_role_emoji"):
         pass
+    if config.get("donate"):
+        await bot.donation(payload)
 
 @client.event
 async def on_raw_reaction_remove(payload):
